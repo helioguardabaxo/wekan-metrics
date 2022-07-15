@@ -76,15 +76,15 @@ def job():
 
     print("\n=== Board Lists START ===")
     colletion = database['lists']
-    documents = colletion.find({'boardId' : boardId})
+    documents = colletion.find({'boardId' : boardId, 'archived' : False})
     boardLists = list(documents)
     print("=== Board Lists END ===\n")
 
-
+    cardsPerList = list('')
     print("\n=== Cards per List START ===")
     colletion = database['cards']
     for boardList in boardLists:
-        documents = colletion.find({'boardId' : boardId, 'listId' : boardList["_id"]})
+        documents = colletion.find({'boardId' : boardId, 'listId' : boardList["_id"], 'archived' : False})
         cardsPerList = list(documents)
     print("=== Cards per List END ===\n")
 
@@ -230,9 +230,15 @@ def job():
     print("=== Board Cards per List END ===\n")
 
 
+
+def cfd_to_csv():
+    df = pd.read_csv("cfd_top.csv", sep=",")
+    return df
+
 def plot_cfd():
     print("\n=== Plot CFD START ===")
-    df = pd.read_csv(filename, sep=",")
+    # df = pd.read_csv(filename, sep=",")
+    df = cfd_to_csv()
     print(df)
     dados = df[['To do', 'Doing', 'Done']]
     print(dados)
@@ -270,15 +276,3 @@ def plot_cfd():
     print("\n=== Plot CFD END ===")
 
 
-# Schedules
-boardId = 'fC64YwSb7Ry4YrvNt'
-schedule.every(60).seconds.do(job)
-# schedule.every().day.at("00:10").do(job)
-
-schedule.every(70).seconds.do(plot_cfd)
-# schedule.every().day.at("00:12").do(plot_cfd)
-
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
